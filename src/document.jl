@@ -25,6 +25,7 @@ function invert_line_ranges(ranges)
         push!(iranges, (startline, r[1]-1))
         startline = r[2] + 1
     end
+    #
     push!(iranges, (startline, 1_000_000))
 
     return iranges
@@ -63,8 +64,10 @@ function Document(text::AbstractString, partial_formats::Vector{Tuple{Int,Int}})
     format_on = true
     str = ""
 
-    sort!(partial_formats)
-    partial_formats = invert_line_ranges(partial_formats)
+    if length(partial_formats) > 0
+        sort!(partial_formats)
+        partial_formats = invert_line_ranges(partial_formats)
+    end
 
     for t in CSTParser.Tokenize.tokenize(text)
         if t.kind === Tokens.WHITESPACE
@@ -179,8 +182,10 @@ function Document(text::AbstractString, partial_formats::Vector{Tuple{Int,Int}})
     if length(stack) == 1 && length(format_skips) == 0
         # -1 signifies everything afterwards "#! format: off"
         # will not formatted.
-        idx1 = findfirst(c -> c == '\n', str)
-        str = str[idx1:end]
+        idx = findfirst(c -> c == '\n', str)
+        if idx !== nothing
+            str = str[idx:end]
+        end
         push!(format_skips, (stack[1], -1, str, false))
     end
 
