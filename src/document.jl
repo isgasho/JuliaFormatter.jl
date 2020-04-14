@@ -22,7 +22,7 @@ function invert_line_ranges(ranges)
 
     startline = 1
     for r in ranges
-        push!(iranges, (startline, r[1]-1))
+        push!(iranges, (startline, r[1] - 1))
         startline = r[2] + 1
     end
     #
@@ -152,15 +152,19 @@ function Document(text::AbstractString, partial_formats::Vector{Tuple{Int,Int}})
         end
 
 
-            if length(partial_formats) > 0 && t.startpos[1] == partial_formats[1][1] && length(stack) == 0
-                push!(stack, t.startpos[1])
-                format_on = false
-            elseif length(partial_formats) > 0 && t.startpos[1] > partial_formats[1][2] && length(stack) > 0
-                push!(format_skips, (pop!(stack), t.startpos[1], str, true))
-                str = ""
-                format_on = true
-                deleteat!(partial_formats, 1)
-            end
+        if length(partial_formats) > 0 &&
+           t.startpos[1] == partial_formats[1][1] &&
+           length(stack) == 0
+            push!(stack, t.startpos[1])
+            format_on = false
+        elseif length(partial_formats) > 0 &&
+               t.startpos[1] > partial_formats[1][2] &&
+               length(stack) > 0
+            push!(format_skips, (pop!(stack), t.startpos[1], str, true))
+            str = ""
+            format_on = true
+            deleteat!(partial_formats, 1)
+        end
 
         prev_tok = t
 

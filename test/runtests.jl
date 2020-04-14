@@ -21,7 +21,7 @@ function run_pretty(
     opts = Options(),
     style = DefaultStyle(),
 )
-d = JuliaFormatter.Document(text, Tuple{Int,Int}[])
+    d = JuliaFormatter.Document(text, Tuple{Int,Int}[])
     s = JuliaFormatter.State(d, 4, print_width, opts)
     x = CSTParser.parse(text, true)
     t = JuliaFormatter.pretty(style, x, s)
