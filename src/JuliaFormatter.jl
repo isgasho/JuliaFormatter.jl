@@ -37,13 +37,13 @@ struct Document
     # a few node types.
     semicolons::Set{Int}
 
-    # List of tuples where a tuple contains
-    # the start and end lines of regions in the
-    # file formatting should be skipped.
+    # List of tuples where a tuple contains the start and end lines 
+    # of regions in the file formatting should be skipped along with 
+    # the contents.
     format_skips::Vector{Tuple{Int,Int,String}}
 end
 
-function Document(text::AbstractString)
+function Document(text::AbstractString, partial_formats::Vector{Tuple{Int,Int}})
     ranges = UnitRange{Int}[]
     lit_strings = Dict{Int,Tuple{Int,Int,String}}()
     comments = Dict{Int,Tuple{Int,String}}()
@@ -122,6 +122,9 @@ function Document(text::AbstractString)
                 # "off" tag on the stack at a time.
                 push!(stack, t.startpos[1])
                 format_on = false
+            elseif !empty(partial_formats) && t.startpos[1] == partial_formats[1][1] && length(stack) == 0
+                push!(stack, t.startpos[1])
+                format_on = false
             elseif occursin(r"^#!\s*format\s*:\s*on\s*$", t.val) && length(stack) > 0
                 # If "#! format: off" has not been seen
                 # "#! format: on" is treated as a normal comment.
@@ -131,6 +134,11 @@ function Document(text::AbstractString)
                 push!(format_skips, (pop!(stack), t.startpos[1], str))
                 str = ""
                 format_on = true
+            elseif !empty(partial_formats) && t.startpos[1] == partial_formats[1][1]+1 && !empty(stack)
+                push!(format_skips, (pop!(stack), t.startpos[1]-1, str))
+                str = ""
+                format_on = true
+                deleteat!(partial_formats, 1)
             end
         elseif t.kind === Tokens.SEMICOLON
             push!(semicolons, t.startpos[1])
@@ -159,7 +167,7 @@ function Document(text::AbstractString)
         str = str[idx1:end]
         push!(format_skips, (stack[1], -1, str))
     end
-    Document(
+    return Document(
         text,
         range_to_line,
         line_to_range,
@@ -366,6 +374,7 @@ function format_text(
     indent::Int = 4,
     margin::Int = 92,
     style::AbstractStyle = DefaultStyle(),
+    partial_formats = Tuple{Int,Int}[],
     always_for_in::Bool = false,
     whitespace_typedefs::Bool = false,
     whitespace_ops_in_indices::Bool = false,

@@ -184,6 +184,13 @@ end
 @inline n_args(x) = length(get_args(x))
 
 function add_node!(t::FST, n::FST, s::State; join_lines = false, max_padding = -1)
+    if length(s.doc.partial_formats) > 0 && n.startline == s.doc.partial_formats[1][1]
+        pf = partial_formats[1]
+        add_node!(t, Notcode(pf[1], pf[2]), s)
+        add_node!(t, Newline(), s)
+        deleteat!(partial_formats, 1)
+    end
+
     if n.typ === SEMICOLON
         join_lines = true
         loc = s.offset > length(s.doc.text) && t.typ === CSTParser.TopLevel ?
