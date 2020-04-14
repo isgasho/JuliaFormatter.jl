@@ -21,7 +21,7 @@ function run_pretty(
     opts = Options(),
     style = DefaultStyle(),
 )
-    d = JuliaFormatter.Document(text)
+d = JuliaFormatter.Document(text, Tuple{Int,Int}[])
     s = JuliaFormatter.State(d, 4, print_width, opts)
     x = CSTParser.parse(text, true)
     t = JuliaFormatter.pretty(style, x, s)
@@ -29,7 +29,7 @@ function run_pretty(
 end
 
 function run_nest(text::String, print_width::Int; opts = Options(), style = DefaultStyle())
-    d = JuliaFormatter.Document(text)
+    d = JuliaFormatter.Document(text, Tuple{Int,Int}[])
     s = JuliaFormatter.State(d, 4, print_width, opts)
     x = CSTParser.parse(text, true)
     t = JuliaFormatter.pretty(style, x, s)
