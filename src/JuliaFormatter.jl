@@ -4,8 +4,7 @@ using CSTParser
 using Tokenize
 using DataStructures
 using Documenter.DocTests: repl_splitter
-import Markdown
-using Markdown: MD, Code, plain
+using Markdown: Markdown, MD, Code
 
 export format, format_text, format_file, DefaultStyle, YASStyle
 
