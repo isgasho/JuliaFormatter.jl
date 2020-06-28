@@ -333,11 +333,10 @@ end
         end
     end
 
-    # @debug "" lines cst.val loc loc[2] sidx
-
     t = FST(CSTParser.StringH, -1, -1, loc[2] - 1, 0, nothing, FST[], Ref(cst), false, 0)
     for (i, l) in enumerate(lines)
         ln = startline + i - 1
+
         l = i == 1 ? l : l[sidx:end]
         tt = FST(
             CSTParser.LITERAL,
@@ -353,6 +352,10 @@ end
         )
         add_node!(t, tt, s)
     end
+
+    # make sure endline matches up with source code
+    t.endline = endline
+
     t
 end
 p_literal(style::S, cst::CSTParser.EXPR, s::State) where {S<:AbstractStyle} =
