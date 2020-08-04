@@ -69,6 +69,7 @@ normalize_line_ending(s::AbstractString) = replace(s, "\r\n" => "\n")
         whitespace_in_kwargs::Bool = true,
         annotate_untyped_fields_with_any::Bool = true,
         format_docstrings::Bool = false,
+        align_struct_fields::Bool = false,
     )::String
 
 Formats a Julia source passed in as a string, returning the formatted
@@ -246,6 +247,7 @@ function format_text(
     whitespace_in_kwargs::Bool = true,
     annotate_untyped_fields_with_any::Bool = true,
     format_docstrings::Bool = false,
+    align_struct_fields::Bool = false,
 )
     isempty(text) && return text
     opts = Options(
@@ -262,6 +264,7 @@ function format_text(
         whitespace_in_kwargs = whitespace_in_kwargs,
         annotate_untyped_fields_with_any = annotate_untyped_fields_with_any,
         format_docstrings = format_docstrings,
+        align_struct_fields = align_struct_fields,
     )
     return format_text(text, style, opts)
 end
@@ -280,8 +283,8 @@ function format_text(cst::CSTParser.EXPR, style::AbstractStyle, s::State)
     s.opts.pipe_to_function_call && pipe_to_function_call_pass!(t)
 
     flatten_fst!(t)
-    align_fst!(t)
     nest!(style, t, s)
+    align_fst!(t, s.opts)
 
     s.line_offset = 0
     io = IOBuffer()
