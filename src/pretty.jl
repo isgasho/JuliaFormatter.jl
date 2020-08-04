@@ -388,7 +388,6 @@ end
     end
 
     startline, endline, str = str_info
-    # @debug "" loc startline endline str
 
     if from_docstring && s.opts.format_docstrings
         str = format_docstring(ds, s, str)
@@ -409,8 +408,6 @@ end
             sidx = min(sidx, fc)
         end
     end
-
-    # @debug "" lines cst.val loc loc[2] sidx
 
     t = FST(CSTParser.StringH, -1, -1, loc[2] - 1, 0, nothing, FST[], Ref(cst), false, 0)
     for (i, l) in enumerate(lines)
@@ -465,8 +462,6 @@ function p_stringh(ds::DefaultStyle, cst::CSTParser.EXPR, s::State)
             sidx = min(sidx, fc)
         end
     end
-
-    # @debug "" lines cst.val loc loc[2] sidx
 
     t = FST(cst, loc[2] - 1)
     for (i, l) in enumerate(lines)
